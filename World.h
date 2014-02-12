@@ -16,15 +16,13 @@ using namespace std;
 class World {
 public:
     World();
-    virtual ~World();
+    ~World();
     void generateTerrain(); //randomly generate world/terrain
     void reset();
     int getAltitude(int x);// returns the height of the terrain at the given x value
     void printWorld();
     void addSpaces();
     void addPlayer(Player &p, int n);
-    void addMissile(Missile m, Player p);
-    void missileToGrid();
     void printMissileWorld();
     Player* getPlayer(int xPos);
     bool xyIsLessEqualTX(int x, int y);

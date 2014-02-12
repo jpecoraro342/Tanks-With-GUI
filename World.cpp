@@ -25,7 +25,8 @@ World::World() {
     generateTerrain();
 }
 
-World::~World() {
+ World::~World() {
+
 }
 
 //generates terrain. First picks random y start point 15-75(to be subtracted by height later. Then for each x value, 0,1,or-1 is randomly generated. The terrain will then act accordingly increasing the y value by 1, keeping it the same, or decreasing by one. bounds are applied 15-75
@@ -122,48 +123,12 @@ bool World::xyIsLessEqualP(int x, int y) {
     return false;
 }
 
-//adds a missile to the world that is shot from the player p. shot stops if x out of bounds, or above two methods true. if It hits player, the player is killed with the kill methods.
-void World::addMissile(Missile m, Player p) {
-    missileToGrid();
-    int initx = p.getXPosition()+2;
-    int inity = p.getYPosition()-1;
-    int x = 0;
-    int y = 0;
-    for (int i = 0; i < width; i ++) {
-        x += m.xVals[i];
-        y += m.yVals[i];
-        
-        if (inity - y < 0) { }
-        else if (initx+x < 0 || initx+x >99) break;
-        else if (xyIsLessEqualTX(initx + x, inity - y))
-            break;
-        else if (xyIsLessEqualP(initx + x, inity - y)) {
-            Player *p1 = getPlayer(initx + x);
-            p1->kill(); //changes status of is alive
-            int px = p1->getXPosition();
-            int py = p1->getYPosition();
-            killPlayer(px, py);
-            break;
-        }
-        else worldPostMissile[initx + x][inity - y] = '.';
-    }
-}
-
 //kills player at given x,y position by replacing the P's with X's
 void World::killPlayer(int x, int y) {
     for (int i = -1; i < 2; i ++) {
         for (int j = -1; j < 2; j++) {
             grid[x + i][y + j] = 'X';
             worldPostMissile[x+i][y+j] = 'X';
-        }
-    }
-}
-
-//resets the world to its state without missiles
-void World::missileToGrid() {
-    for (int i =0; i < height; i ++) {
-        for (int j = 0; j < width; j ++) {
-            worldPostMissile[j][i] = grid[j][i];
         }
     }
 }
