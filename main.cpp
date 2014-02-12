@@ -3,16 +3,24 @@
 #include "ResourcePath.hpp"
 #include "Terrain.h"
 #include "World.h"
+#include "Missile.h"
 
 #define FPS 60.0f;
 float sleep = 1.0f/FPS;
+
+sf::Clock Clock;
+
+const float Speed = 120.f;
 
 int main(int, char const**)
 {
     sf::Vector2i screenDimensions(1280, 720);
     // Create the main window
     sf::RenderWindow window(sf::VideoMode(screenDimensions.x, screenDimensions.y), "Tanks");
-    World map = *new World();
+    World *map = new World();
+    
+    Terrain *terrain = new Terrain(screenDimensions, map);
+    Missile *missile = new Missile(100, 45, sf::Vector2i(100,600), screenDimensions, map);
     
     // Start the game loop
     while (window.isOpen())
@@ -27,25 +35,35 @@ int main(int, char const**)
             }
 
             // Espace pressed : exit
-            if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Q) {
+            else if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Q) {
                 window.close();
             }
             
-            if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Space) {
-                map = *new World();
+            else if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Space) {
+                delete map;
+                map = new World();
+                terrain = new Terrain(screenDimensions, map);
+            }
+            
+            else if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
+                missile = new Missile(100, 45, sf::Vector2i(100,600), screenDimensions, map);
             }
         }
 
         // Clear screen
         window.clear(sf::Color(0,230,230));
         
-        Terrain terrain(screenDimensions, &map);
+        window.draw(*terrain);
         
-        window.draw(terrain);
+        missile->prepareForLaunch();
+        
+        window.draw(*missile);
         
         window.display();
         
-        sf::sleep(sf::seconds(sleep));
+        missile->incrementTime(Clock.getElapsedTime());
+        Clock.restart();
+        //sf::sleep(sf::seconds(sleep));
     }
     
     return EXIT_SUCCESS;
