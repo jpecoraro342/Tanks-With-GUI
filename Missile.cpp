@@ -24,6 +24,7 @@ Missile::Missile(int velocity, int angle, sf::Vector2i initLocation, sf::Vector2
     sd = screenDimensions;
     w = world;
     time = 0;
+    radius = 5;
 }
 
 Missile::~Missile() {
@@ -54,7 +55,20 @@ void Missile::degreesToRadians() {
 }
 
 void Missile::prepareForLaunch() {
-    if (currentx-20 <= 0 || currentx+20 >=sd.x || currenty-20 <= 0 || currenty+20 >=sd.y) {
+    if (currentx-2*radius <= 0) {
+        currentx = 2*radius;
+        return;
+    }
+    else if (currentx+2*radius >=sd.x) {
+        currentx = sd.x-2*radius;
+        return;
+    }
+    else if (currenty-2*radius <= 0) {
+        currenty = 2*radius;
+        return;
+    }
+    else if (currenty+2*radius >=sd.y) {
+        currenty = sd.y-2*radius;
         return;
     }
     currentx = initxPos + getXPosition();
@@ -66,7 +80,7 @@ void Missile::incrementTime(sf::Time t) {
 }
 
 void Missile::draw(sf::RenderTarget& target, sf::RenderStates states) const{
-    sf::CircleShape missile(10);
+    sf::CircleShape missile(radius);
     missile.setFillColor(sf::Color(100,100,100));
     missile.setPosition(sf::Vector2f(currentx, currenty));
     target.draw(missile);

@@ -43,6 +43,7 @@ private:
     sf::Vector2i sd;
     World *w;
     float time;
+    int radius;
 };
 
 #endif	/* MISSILE_H */
