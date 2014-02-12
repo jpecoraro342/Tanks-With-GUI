@@ -20,7 +20,9 @@ int main(int, char const**)
     World *map = new World();
     
     Terrain *terrain = new Terrain(screenDimensions, map);
-    Missile *missile = new Missile(100, 45, sf::Vector2i(100,600), screenDimensions, map);
+    Missile *missile = new Missile(100, 45, sf::Vector2i(21,699), screenDimensions, map);
+    
+    srand(time(NULL));
     
     // Start the game loop
     while (window.isOpen())
@@ -46,7 +48,7 @@ int main(int, char const**)
             }
             
             else if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
-                missile = new Missile(100, 45, sf::Vector2i(100,600), screenDimensions, map);
+                missile = new Missile(rand()%75+50, rand()%80, sf::Vector2i(21,699), screenDimensions, map);
             }
         }
 
