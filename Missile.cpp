@@ -6,31 +6,35 @@
  */
 
 #define _USE_MATH_DEFINES
+#include <SFML/Audio.hpp>
+#include <SFML/Graphics.hpp>
+#include "ResourcePath.hpp"
 #include "Missile.h"
+#include "World.h"
 #include <math.h>
 
-Missile::Missile(int velocity, int angle) {
+Missile::Missile(int velocity, int angle, sf::Vector2i initLocation, sf::Vector2i screenDimensions, World *world) {
     initialVelocity = velocity;
     angleDegrees = angle;
     degreesToRadians();
     calcXVelocity();
     calcinitYVelocity();
-    findYVeloc();
-    if (angleDegrees < 90) calcValues();
-    else calcNegXValues();
+    currentx = initxPos = initLocation.x;
+    currenty = inityPos = initLocation.y;
+    sd = screenDimensions;
+    w = world;
+    time = 0;
 }
 
 Missile::~Missile() {
 }
 
-//unused
-float Missile::getXPosition(float t) {
-    return xVelocity*t;
+float Missile::getXPosition() {
+    return xVelocity*time;
 }
 
-//unused
-float Missile::getYPosition(float t) {
-    return (initYVelocity*t) - (.5*9.8*t*t);
+float Missile::getYPosition() {
+    return (initYVelocity*time) - (.5*9.8*time*time);
 }
 
 void Missile::calcXVelocity() {
@@ -41,205 +45,30 @@ void Missile::calcinitYVelocity() {
     initYVelocity = initialVelocity*sin(angleRadians);
 }
 
-float Missile::calcYVelocity(float t) {
-    return initYVelocity + -9.8*t;
+void Missile::calcYVelocity() {
+    yVelocity = initYVelocity - 9.8*time;
 }
 
 void Missile::degreesToRadians() {
     angleRadians = angleDegrees*M_PI/180.0;
 }
 
-//finds 100 y velocity for given time intervals of +.4(seconds)
-void Missile::findYVeloc() {
-    int counter = 0;
-    for (float t = 0; t < 40; t += .4) {
-        yVeloc[counter] = int(calcYVelocity(t)+.5);
-        counter ++;
+void Missile::prepareForLaunch() {
+    if (currentx-20 <= 0 || currentx+20 >=sd.x || currenty-20 <= 0 || currenty+20 >=sd.y) {
+        return;
     }
+    currentx = initxPos + getXPosition();
+    currenty = inityPos - getYPosition();
 }
 
-//used for the shot trajectory. Based on the size of the constant x velocity in comparison with the changing y velocity, the loop decides how many times to move x for the number of times it moves y.
-void Missile::calcValues() {
-    float x = xVelocity;
-    int y;
-    int index = 1;
-    int dif;
-    xVals[0] = 0;
-    yVals[0] = 0;
-    for (int i = 1; i < 100; i ++) {
-        if (index >= 100) break;
-        y = yVeloc[i];
-        if (y>x) {
-            dif = int ((y/(float)x) +.5);
-            
-            if (dif > 1) {
-                for (int j = 0; j < dif; j ++) {
-                    yVals[index] = 1;
-                    xVals[index] = 0;
-                    index++;
-                    if (index >= 100) break;
-                }
-                xVals[index - dif] = 1;
-            }
-            else {
-                xVals[index] = 1;
-                yVals[index] = 1;
-                index++;
-            }
-        }
-        else if ((y*-1) > x) {
-            y = y*-1;
-            dif = int (y/(float)x) +.5;
-            
-            if (dif > 1) {
-                for (int j = 0; j < dif; j ++) {
-                    yVals[index] = -1;
-                    xVals[index] = 0;
-                    index++;
-                    if (index >= 100) break;
-                }
-                xVals[index - dif] = 1;
-            }
-            else {
-                xVals[index] = 1;
-                yVals[index] = -1;
-                index++;
-            }
-        }
-        else if (fabs(y) < 7) {
-            xVals[index] = 1;
-            yVals[index] = 0;
-            index++;
-        }
-        else if (y < 0) {
-            y=y*-1;
-            dif = int ((x/(float)y) +.5);
-            
-            if (dif > 1) {
-                for (int j = 0; j < dif; j ++) {
-                    xVals[index] = 1;
-                    yVals[index] = 0;
-                    index++;
-                    if (index >= 100) break;
-                }
-                yVals[index - dif] = -1;
-            }
-            else {
-                xVals[index] = 1;
-                yVals[index] = -1;
-                index++;
-            }
-        }
-        else {
-            dif = int ((x/(float)y) +.5);
-            
-            if (dif > 1) {
-                for (int j = 0; j < dif; j ++) {
-                    xVals[index] = 1;
-                    yVals[index] = 0;
-                    index++;
-                    if (index >= 100) break;
-                }
-                yVals[index - dif] = 1;
-            }
-            else {
-                xVals[index] = 1;
-                yVals[index] = 1;
-                index++;
-            }
-        }
-    }
+void Missile::incrementTime(sf::Time t) {
+    time += t.asSeconds()*10;
 }
 
-//same as above but for negative x values (angle greater than 90
-void Missile::calcNegXValues() {
-    float x = -1 * xVelocity;
-    int y;
-    int index = 1;
-    int dif;
-    xVals[0] = -4;
-    yVals[0] = 0;
-    for (int i = 1; i < 100; i ++) {
-        if (index >= 100) break;
-        y = yVeloc[i];
-        if (y>x) {
-            dif = int ((y/(float)x) +.5);
-            
-            if (dif > 1) {
-                for (int j = 0; j < dif; j ++) {
-                    yVals[index] = 1;
-                    xVals[index] = 0;
-                    index++;
-                    if (index >= 100) break;
-                }
-                xVals[index - dif] = -1;
-            }
-            else {
-                xVals[index] = -1;
-                yVals[index] = 1;
-                index++;
-            }
-        }
-        else if ((y*-1) > x) {
-            y = y*-1;
-            dif = int (y/(float)x) +.5;
-            
-            if (dif > 1) {
-                for (int j = 0; j < dif; j ++) {
-                    yVals[index] = -1;
-                    xVals[index] = 0;
-                    index++;
-                    if (index >= 100) break;
-                }
-                xVals[index - dif] = -1;
-            }
-            else {
-                xVals[index] = -1;
-                yVals[index] = -1;
-                index++;
-            }
-        }
-        else if (fabs(y) < 7) {
-            xVals[index] = -1;
-            yVals[index] = 0;
-            index++;
-        }
-        else if (y < 0) {
-            y=y*-1;
-            dif = int ((x/(float)y) +.5);
-            
-            if (dif > 1) {
-                for (int j = 0; j < dif; j ++) {
-                    xVals[index] = -1;
-                    yVals[index] = 0;
-                    index++;
-                    if (index >= 100) break;
-                }
-                yVals[index - dif] = -1;
-            }
-            else {
-                xVals[index] = -1;
-                yVals[index] = -1;
-                index++;
-            }
-        }
-        else {
-            dif = int ((x/(float)y) +.5);
-            
-            if (dif > 1) {
-                for (int j = 0; j < dif; j ++) {
-                    xVals[index] = -1;
-                    yVals[index] = 0;
-                    index++;
-                    if (index >= 100) break;
-                }
-                yVals[index - dif] = 1;
-            }
-            else {
-                xVals[index] = -1;
-                yVals[index] = 1;
-                index++;
-            }
-        }
-    }
+void Missile::draw(sf::RenderTarget& target, sf::RenderStates states) const{
+    sf::CircleShape missile(10);
+    missile.setFillColor(sf::Color(100,100,100));
+    missile.setPosition(sf::Vector2f(currentx, currenty));
+    target.draw(missile);
 }
+

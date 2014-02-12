@@ -8,33 +8,41 @@
 #ifndef MISSILE_H
 #define	MISSILE_H
 
-class Missile {
+#include <SFML/Audio.hpp>
+#include <SFML/Graphics.hpp>
+#include "ResourcePath.hpp"
+#include "World.h"
+
+class Missile : public sf::Drawable {
 public:
-    Missile(){ }
-    Missile(int velocity, int angle);
-    float getXPosition(float t);
-    float getYPosition(float t);
+    Missile(int velocity, int angle, sf::Vector2i initLocation, sf::Vector2i screenDimensions, World *world);
+    float getXPosition();
+    float getYPosition();
     void calcXVelocity();
     void calcinitYVelocity();
     void degreesToRadians();
     void findYVeloc();
-    void calcValues();
-    void calcNegXValues(); // for angle > 90
-    float calcYVelocity(float t);
-    
-    float xVelocity;
-    
-    int xVals[100];
-    int yVals[100];
-    int yVeloc[100];
+    void calcYVelocity();
+    void prepareForLaunch();
+    void incrementTime(sf::Time t);
     
     virtual ~Missile();
 private:
+    int initxPos;
+    int inityPos;
+    int currentx;
+    int currenty;
+    int initialVelocity;
     float initYVelocity;
+    float yVelocity;
+    float xVelocity;
     int angleDegrees;
     float angleRadians;
-    int initialVelocity;
-    
+    virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
+    sf::Color missileColor = sf::Color(100,100,100);
+    sf::Vector2i sd;
+    World *w;
+    float time;
 };
 
 #endif	/* MISSILE_H */
