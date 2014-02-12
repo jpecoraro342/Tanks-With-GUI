@@ -5,7 +5,7 @@
 #include "World.h"
 #include "Missile.h"
 
-#define FPS 60.0f;
+#define FPS 120.0f;
 float sleep = 1.0f/FPS;
 
 sf::Clock Clock;
@@ -63,7 +63,7 @@ int main(int, char const**)
         
         missile->incrementTime(Clock.getElapsedTime());
         Clock.restart();
-        //sf::sleep(sf::seconds(sleep));
+        sf::sleep(sf::seconds(sleep));
     }
     
     return EXIT_SUCCESS;
