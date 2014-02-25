@@ -10,12 +10,11 @@
 
 #include <SFML/Audio.hpp>
 #include <SFML/Graphics.hpp>
-#include "ResourcePath.hpp"
 #include "World.h"
 
 class Missile : public sf::Drawable {
 public:
-    Missile(int velocity, int angle, sf::Vector2i initLocation, sf::Vector2i screenDimensions, World *world);
+    Missile(sf::Vector2i screenDimensions, World *world, int velocity, int angle, sf::Vector2i initLocation);
     float getXPosition();
     float getYPosition();
     void calcXVelocity();

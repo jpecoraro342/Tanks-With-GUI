@@ -8,12 +8,11 @@
 #define _USE_MATH_DEFINES
 #include <SFML/Audio.hpp>
 #include <SFML/Graphics.hpp>
-#include "ResourcePath.hpp"
 #include "Missile.h"
 #include "World.h"
 #include <math.h>
 
-Missile::Missile(int velocity, int angle, sf::Vector2i initLocation, sf::Vector2i screenDimensions, World *world) {
+Missile::Missile(sf::Vector2i screenDimensions, World *world, int velocity, int angle, sf::Vector2i initLocation) {
     initialVelocity = velocity;
     angleDegrees = angle;
     degreesToRadians();

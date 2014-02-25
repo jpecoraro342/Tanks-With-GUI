@@ -4,6 +4,7 @@
 #include "Terrain.h"
 #include "World.h"
 #include "Missile.h"
+#include "Tank.h"
 
 #define FPS 120.0f;
 float sleep = 1.0f/FPS;
@@ -20,7 +21,9 @@ int main(int, char const**)
     World *map = new World();
     
     Terrain *terrain = new Terrain(screenDimensions, map);
-    Missile *missile = new Missile(100, 45, sf::Vector2i(21,699), screenDimensions, map);
+    Missile *missile = new Missile(screenDimensions, map, 100, 45, sf::Vector2i(35,695));
+    Tank *tank = new Tank(screenDimensions, map, sf::Color(50,50,50), 10, 710);
+    
     
     srand(time(NULL));
     
@@ -48,7 +51,7 @@ int main(int, char const**)
             }
             
             else if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
-                missile = new Missile(rand()%75+50, rand()%80, sf::Vector2i(21,699), screenDimensions, map);
+                missile = new Missile(screenDimensions, map, rand()%75+50, rand()%80, sf::Vector2i(35,695));
             }
         }
 
@@ -60,6 +63,8 @@ int main(int, char const**)
         missile->prepareForLaunch();
         
         window.draw(*missile);
+        
+        window.draw(*tank);
         
         window.display();
         
